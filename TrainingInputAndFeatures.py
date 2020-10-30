@@ -17,6 +17,7 @@ import sys
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.decomposition import NMF, LatentDirichletAllocation
 
+from definitions import GetPartyDictionary,SetMatchPatterns
 
 matplotlib.rc('font',family='monospace')
 plt.style.use('ggplot')
@@ -176,151 +177,47 @@ def CreateTopics(scikittext,stop_words,topics=6,doLDA=False):
         nmf = NMF(n_components=topics, random_state=1,beta_loss='kullback-leibler', solver='mu', max_iter=1000, alpha=.1,l1_ratio=.5).fit(count)
         return nmf,count_feature_names;
 
-partydict={"OBAMA":"Democratic","MCCAIN":"Republican","ROMNEY":"Republican","MR. KENNEDY":"Democratic",
-    "MR. NIXON":"Republican","MR. FORD":"Republican","MR. CARTER":"Democratic","MR. REAGAN":"Republican",
-    "MR. MONDALE":"Democratic","GEORGE W. BUSH":"Republican","GEORGE H.W. BUSH":"Republican","DUKAKIS":"Democratic",
-    "BILL CLINTON":"Democratic","HILLARY CLINTON":"Democratic","DOLE":"Republican","GORE":"Democratic",
-    "KERRY":"Democratic","TRUMP":"Republican","BIDEN":"Democratic"}
-
-#partydict={"OBAMA":"Democratic","MCCAIN":"Republican","ROMNEY":"Republican","MR. KENNEDY":"Democratic","SENATOR KENNEDY":"Democratic",
-    #"MR. NIXON":"Republican","MR. FORD":"Republican","MR. CARTER":"Democratic","MR. REAGAN":"Republican","MR. MONDALE":"Democratic",
-    #"BUSH":"Republican","PRESIDENT BUSH":"Republican","DUKAKIS":"Democratic","CLINTON":"Democratic","DOLE":"Republican","GORE":"Democratic","KERRY":"Democratic","TRUMP":"Republican","BIDEN":"Democratic"}
+partydict=GetPartyDictionary()
 speakers=[key.lower() for key in partydict.keys() ]
 #CandidateDF,FascilatorDF,Debate_df=BuildDF(partydict,False,"Reagan-Mondale")
-CandidateDF,FascilatorDF,Debate_df=BuildDF(partydict,True)
+CandidateDF,FascilatorDF,Debate_df=BuildDF(partydict,True)#### All DataFrame
+
+#### Build for pie charts:
+
+
 #CreateScatterText(CandidateDF,200000)
-PromptsModeratorComments=FascilatorDF["Response"].to_list()
 #PromptsModeratorComments=[p.lower() for p in PromptsModeratorComments]
 nlpPyRank = spacy.load("en_core_web_lg")
 stop_words=['evening','night','senator','vice','president','united','states','question','questions','seconds','second','minutes','minute','last','mr','time','governor','closing','opening','rebuttal','segment',"follow up","transcription","town hall"]
-stop_words.extend(", ".join(speakers).split(" "))
 Moderatorlist=list(set(FascilatorDF["Speaker"].to_list()))
+stop_words.extend(", ".join(speakers).split(" "))
 stop_words.extend(", ".join(Moderatorlist).split())
 for w in stop_words:nlpPyRank.vocab[w].is_stop = True;
 tr = pytextrank.TextRank()
 nlpPyRank.add_pipe(tr.PipelineComponent, name="textrank", last=True)
-docs=nlpPyRank.pipe(PromptsModeratorComments)
 
-#scikittext=InputTextFeatures(docs,0.1,stop_words)
-#CreateTopics(scikittext,stop_words,6,False)
-#topicWords=display_topics(nmf,count_feature_names,20)
+PromptsModeratorComments=FascilatorDF["Response"].to_list()
 
+##### These lines are only for feature exploration
+def BuildTopics(PromptsModeratorComments,RankScore=0.1,NTopics=6,TopicWords=20,doLDA=False ):
+    docs=nlpPyRank.pipe(PromptsModeratorComments)
+    scikittext=InputTextFeatures(docs,RankScore,stop_words)
+    model=CreateTopics(scikittext,stop_words,NTopics,doLDA)
+    topicWords=display_topics(model,count_feature_names,TopicWords)
+    return model,topicWords
 
 ##### At this point i have the key debate topics
 ##############
-
 
 topic=0
 CandResponses=CandidateDF["Response"].to_list()
 #CandResponses=[cand.lower() for cand in CandidateDF["Response"].to_list()]
 Speakers=[cand.lower() for cand in CandidateDF["Speaker"].to_list()]
-
 Canddocs=nlpPyRank.pipe(CandResponses)
 
 ##### Make part of user definition functions
 matcher = Matcher(nlpPyRank.vocab)
-#### Race relations and racial sensitivity
-RACE=[{"LOWER":"black"},{"POS":"NOUN"}]
-matcher.add("Race",None,RACE)
-matcher.add("Race",None,[{"LOWER":{"IN":["racist","racial","segregated","hispanic","discrimination"]}}])
-matcher.add("Race",None,[{"LOWER":"civil"},{"LOWER":"rights"}])
-matcher.add("Race",None,[{"LOWER":"white"},{"LOWER":"supremacists"}])
-matcher.add("Race",None,[{"LOWER":"affirmative"},{"LOWER":"action"}])
-matcher.add("Race",None,[{"LOWER":"race"},{"LOWER":"relations"}])
-matcher.add("Race",None,[{"LOWER":"hate"},{"LEMMA":"crime"}])
-matcher.add("Race",None,[{"LOWER":"non"},{"IS_PUNCT":True,"OP":"?"},{"LOWER":"whites"}])
-
-#### Gun control:
-matcher.add("Gun Control",None,[{"LOWER":"gun"},{"LOWER":"control", "OP":"?"}])
-matcher.add("Gun Control",None,[{"LOWER":"assault"},{"LOWER":"weapons"}])
-matcher.add("Gun Control",None,[{"LOWER":"high"},{"LOWER":"capacity"},{"LEMMA":"magazine"}])
-#### Oil:
-matcher.add("Oil Industry",None,[{"LOWER":"oil"},{"LOWER":{"IN":["imports","industry","price","embargos"]},"OP":"?"}])
-matcher.add("Oil Industry",None,[{"LOWER":{"IN":["arab","foreign"]}},{"LOWER":"oil"}])
-matcher.add("Oil Industry",None,[{"LOWER":"inequitable"},{"LOWER":"depletion"}])
-matcher.add("Oil Industry",None,[{"LOWER":"depletion"},{"LOWER":"allowance"}])
-matcher.add("Oil Industry",None,[{"LOWER":"gas"},{"LEMMA":"price"}])
-matcher.add("Oil Industry",None,[{"LOWER":"fossil"},{"LEMMA":"power"}])
-
-#### Federal Spending
-matcher.add("Federal Spending",None,[{"LOWER":{"IN":["deficit","surplus"]}}])
-matcher.add("Federal Spending",None,[{"LOWER":"federal"},{"LOWER":{"IN":["spending","debt","deficit"]}}])
-matcher.add("Federal Spending",None,[{"LOWER":"spending"},{"LOWER":"freeze"}])
-matcher.add("Federal Spending",None,[{"LOWER":"budgetary"},{"LOWER":"restraints"}])
-matcher.add("Federal Spending",None,[{"LOWER":"discretionary"},{"LOWER":"spending"}])
-
-#### Health care
-matcher.add("Health Care",None,[{"LOWER":"health"},{"LOWER":{"IN":["care","insurance","policies"]}}])
-matcher.add("Health Care",None,[{"LOWER":"private"},{"LOWER":"insurance"}])
-matcher.add("Health Care",None,[{"LOWER":"public"},{"LOWER":"health"}])
-matcher.add("Health Care",None,[{"LOWER":"socialized"},{"LOWER":"medicine"}])
-matcher.add("Health Care",None,[{"LOWER":"insurance"},{"LOWER":"companies"}])
-matcher.add("Health Care",None,[{"LOWER":"prescription"},{"LOWER":"drugs"}])
-
-#### Economic Growth/Recovery
-matcher.add("Economy", None,[{"LOWER":"economic"},{"LOWER":{"IN":["problems","growth","issues","situation","crisis","realities"]}}])
-matcher.add("Economy", None,[{"LOWER":"financial"},{"LOWER":{"IN":["bailout","crisis","rescue","problems"]}}])
-matcher.add("Economy",None,[{"LOWER":"small", "OP":"?"},{"LOWER":"businesses"}])
-matcher.add("Economy",None,[{"LOWER":{"IN":["gdp","economy"]}}])
-matcher.add("Economy",None,[{"LOWER":"bank"},{"LOWER":"crisis"}])
-matcher.add("Economy",None,[{"LOWER":"stock"},{"LOWER":"market"}])
-matcher.add("Economy",None,[{"LOWER":"inflation"},{"LOWER":"rate"}])
-matcher.add("Economy",None,[{"LOWER":"savings"},{"LOWER":"accounts"}])
-matcher.add("Economy",None,[{"LOWER":"underlying"},{"LOWER":"inflation"}])
-matcher.add("Economy",None,[{"LOWER":{"IN":["good","paying","american","more"]}},{"LOWER":"jobs"}])
-matcher.add("Economy",None,[{"LOWER":"full"},{"LOWER":"employment"}])
-matcher.add("Economy",None,[{"LOWER":"unemployment"}])
-matcher.add("Economy",None,[{"LOWER":"working"},{"LOWER":"families"}])
-matcher.add("Economy",None,[{"LOWER":"wage"},{"LEMMA":"earner"}])
-
-### Social Welfare programs: e.g. Social Security, housing subsidies, federal minimum wage,
-matcher.add("Social Welfare",None,[{"LOWER":"social"},{"LOWER":"security"}])
-matcher.add("Social Welfare",None,[{"LOWER":"housing"},{"LOWER":"subsidies"}])
-matcher.add("Social Welfare",None,[{"LOWER":"minimum"},{"LOWER":"wage"}])
-matcher.add("Social Welfare",None,[{"LOWER":"prevailing"},{"LOWER":"wages"}])
-matcher.add("Social Welfare",None,[{"LOWER":"abnormal"},{"LOWER":"poverty"}])
-
-
-#### Public education
-matcher.add("Public Education",None,[{"LOWER":"public"},{"LOWER":"education"}])
-matcher.add("Public Education",None,[{"LEMMA":"school"},{"LOWER":{"IN":["buildings","teachers","districts","violence"],"OP":"?"}}])
-matcher.add("Public Education",None,[{"LOWER":"teacher"},{"LOWER":"salaries"}])
-matcher.add("Public Education",None,[{"LOWER":"high"},{"LOWER":"school"},{"LOWER":"graduates"}])
-
-#### Abortion
-matcher.add("abortion",None,[{"LOWER":{"IN":["abortions","abortion"]}}])
-
-#####National security/Defense
-matcher.add("National Defense",None,[{"LOWER":"defense"},{"LOWER":{"IN":["spending","budget"]}}])
-matcher.add("National Defense",None,[{"LOWER":"war"},{"LOWER":"materials"}])
-matcher.add("National Defense",None,[{"LOWER":"military"},{"LOWER":{"IN":["forces","equipment","action","technology","power"]}}])
-matcher.add("National Defense",None,[{"LOWER":"hostile"},{"LOWER":"actors"}])
-matcher.add("National Defense",None,[{"LOWER":"terrorist"},{"LOWER":"attacks"}])
-matcher.add("National Defense",None,[{"LOWER":"nuclear"},{"LOWER":"warheads"}])
-matcher.add("National Defense",None,[{"LOWER":"national"},{"LOWER":"security"}])
-matcher.add("National Defense",None,[{"LOWER":"more"},{"LOWER":"troops"}])
-matcher.add("National Defense",None,[{"LOWER":"foreign"},{"LOWER":"hot"},{"LOWER":"spots"}])
-matcher.add("National Defense",None,[{"LOWER":"back"},{"LOWER":"door"},{"LOWER":"draft"}])
-
-#### Immigration
-matcher.add("Immigration",None,[{"LOWER":"immigration"},{"LOWER":"reform"}])
-matcher.add("Immigration",None,[{"LOWER":"green"},{"LOWER":"cards"}])
-matcher.add("Immigration",None,[{"LOWER":"illegal"},{"LOWER":{"IN":["immigration","workers"]}}])
-
-#### Climate change /Alternative energy
-matcher.add("Climate Change",None,[{"LOWER":"air"},{"LOWER":"pollution"}])
-matcher.add("Climate Change", None, [{"LOWER":"climate"}, {"LOWER":"change"}])
-matcher.add("Climate Change", None, [{"LOWER":"global"}, {"LOWER":"energy"}])
-matcher.add("Climate Change", None, [{"LOWER":"global"}, {"LOWER":"warming"}])
-matcher.add("Climate Change", None, [{"LOWER":"alternative"}, {"LOWER":"energy"}])
-matcher.add("Climate Change", None, [{"LOWER":"energy"}, {"LOWER":{"IN":["secretary", "policy"]}}])
-matcher.add("Climate Change", None, [{"LOWER":"conservation"}, {"LOWER":"efforts"}])
-
-#### Return these
-dictionaryFoundKeywords={"Race":[],"Immigration":[], "Gun Control":[],"Climate Change":[], "Federal Spending":[], "abortion":[], "National Defense":[],
-"Oil Industry":[], "Economy":[], "Public Education":[],"Health Care":[], "Social Welfare":[]}
-dictionaryCounts={"Race":0,"Immigration":0, "Gun Control":0,"Climate Change":0, "Federal Spending":0, "abortion":0, "National Defense":0,
-"Oil Industry":0, "Economy":0, "Public Education":0,"Health Care":0, "Social Welfare":0  }
+matcher,dictionaryFoundKeywords,dictionaryCounts=SetMatchPatterns(matcher)
 
 ##### This function will record how many responses match a token based matchpattern
 TopicMatches=[]
@@ -330,9 +227,9 @@ for doc in Canddocs:### Loop in order of the response column
     else:TopicMatches.append(False)
     for match_id, start, end in matches:
         Topic=nlpPyRank.vocab.strings[match_id]
-        dictionaryCounts[Topic]=dictionaryCounts[Topic]+1
+        dictionaryCounts[Topic]=dictionaryCounts[Topic]+1#### Count for each topic
         dictionaryFoundKeywords[Topic].append(doc[start:end].text)
-for key in dictionaryFoundKeywords.keys():dictionaryFoundKeywords[key]=list(set(dictionaryFoundKeywords[key]))
+for key in dictionaryFoundKeywords.keys():dictionaryFoundKeywords[key]=list(set(dictionaryFoundKeywords[key]))#### Keywords
 CandidateDF.insert(CandidateDF.shape[1],column="MatchToTopic",value=TopicMatches)
 ###Then require a topic match
 Topics=[key for key in dictionaryCounts.keys()]
@@ -340,6 +237,10 @@ Counts=[dictionaryCounts[key] for key in dictionaryCounts.keys()]
 Keywords=[", ".join(dictionaryFoundKeywords[key]) for key in dictionaryCounts.keys()]
 Dfout=pd.DataFrame.from_dict({"Topic":Topics,"Count":Counts,"Keywords":Keywords})
 Dfout.to_csv("OutputTotalDebateTopics.csv")
+##### At this point you could make a pie chart from the above data
+
+UnlabeledCandidateDF=CandidateDF[CandidateDF.MatchToTopic==False]
+UnlabeledCandidateDF.to_csv("Test_candidates.csv")
 CandidateDF=CandidateDF[CandidateDF.MatchToTopic==True]
 CandDocsKeywords=nlpPyRank.pipe(CandidateDF.Response.to_list())
 MatchedWords=[]

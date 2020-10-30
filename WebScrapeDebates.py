@@ -4,6 +4,10 @@ import requests
 import re
 import pandas as pd
 import glob,os
+
+from definitions import GetSpeakerList
+
+
 def PrettifyHTMLScrape(weburl):
     req = requests.get(weburl)
     htmlSource=req.content
@@ -54,64 +58,7 @@ def CreateRawCSV():
     ### Move these to a definitions file
     #### 4 debates JFK v Nixon 1960
     #### Put a function in defintions to create this dictionary
-    dictionaryOfSpeakers={"The_First_Kennedy-Nixon_Presidential_Debate.html":["MR. NIXON", "MR. KENNEDY","SENATOR KENNEDY", "MR. SMITH"]}
-    dictionaryOfSpeakers.update({"The_Second_Kennedy-Nixon_Presidential_Debate.html":["MR. NIXON", "MR. KENNEDY","MR. McGEE","MR. NIVEN","MR. MORGAN","MR. SPIVAK","MR. LEVY"]})
-    dictionaryOfSpeakers.update({"The_Third_Kennedy-Nixon_Presidential_Debate.html":["MR. NIXON", "MR. KENNEDY","MR. SHADEL","MR. McGee","MR. DRUMMOND","MR. VON FREMD"]})
-    dictionaryOfSpeakers.update({"The_Fourth_Kennedy-Nixon_Presidential_Debate.html":["MR. NIXON", "MR. KENNEDY","MR. HOWE"]})
-    ####  3 debates Carter v. Ford 1976
-    dictionaryOfSpeakers.update({"The_First_Carter-Ford_Presidential_Debate.html":["MR. FORD","MR. CARTER","MR. NEWMAN","MR. GANNON","MR. REYNOLDS","MS. DREW"]})
-    dictionaryOfSpeakers.update({"The_Second_Carter-Ford_Presidential_Debate.html":["MR. FORD","MR. CARTER","MS. FREDERICK","MR. FRANKEL","MR. TREWHITT","MR. VALERIANI"]})
-    dictionaryOfSpeakers.update({"The_Third_Carter-Ford_Presidential_Debate.html":["MR. FORD","MR. CARTER","MS. WALTERS","MR. KRAFT","MR. MAYNARD","MR. NELSON"]})
-
-    #### 1 debates Carter v. Reagen 1980
-    dictionaryOfSpeakers.update({"The_Anderson-Reagan_Presidential_Debate.html":["REAGAN","MOYERS","ANDERSON"]})
-    dictionaryOfSpeakers.update({"The_Carter-Reagan_Presidential_Debate.html":["MR. REAGAN","MR. CARTER","MR. SMITH","MR. STONE","MR. ELLIS","MR. HILLIARD","MS. WALTERS"]})
-    #### 2 debates Mondale v. Reagan 1984
-    dictionaryOfSpeakers.update({"The_First_Reagan-Mondale_Presidential_Debate.html":["THE PRESIDENT","MR. MONDALE","MS. WALTERS","MR. WIEGHART","MS. SAWYER","MR. BARNES"]})### This file has some mis-formatting in the beginning
-    dictionaryOfSpeakers.update({"The_Second_Reagan-Mondale_Presidential_Debate.html":["THE PRESIDENT","MR. MONDALE","MR. NEWMAN","MS. GEYER","MR. KALB","MR. KONDRACKE","Mr. Trewhitt"]})### Reformat the last panelist
-
-    #### 2 debates Dukakis v. Bush 1988
-    dictionaryOfSpeakers.update({"The_First_Bush-Dukakis_Presidential_Debate.html":["BUSH","DUKAKIS","LEHRER","JENNINGS","MASHEK"]})
-    dictionaryOfSpeakers.update({"The_Second_Bush-Dukakis_Presidential_Debate.html":["BUSH","DUKAKIS","SHAW","COMPTON","WARNER"]})
-    #### 3 debates split by halfs Clinton v.Bush 1992
-    dictionaryOfSpeakers.update({"The_First_Clinton-Bush-Perot_Presidential_Debate_First_Half.html":["PEROT","PRESIDENT BUSH","CLINTON","MASHEK","LEHRER","VANOCUR","COMPTON"]})
-    dictionaryOfSpeakers.update({"The_First_Clinton-Bush-Perot_Presidential_Debate_Second_Half.html":["PEROT","BUSH","CLINTON","MASHEK","LEHRER","VANOCUR","COMPTON"]})
-    dictionaryOfSpeakers.update({"The_Second_Clinton-Bush-Perot_Presidential_Debate_First_Half.html":["PEROT","BUSH","CLINTON","SIMPSON","AUDIENCE QUESTION"]})
-    dictionaryOfSpeakers.update({"The_Second_Clinton-Bush-Perot_Presidential_Debate_Second_Half.html":["PEROT","BUSH","CLINTON","SIMPSON","AUDIENCE QUESTION"]})
-    dictionaryOfSpeakers.update({"The_Third_Clinton-Bush-Perot_Presidential_Debate.html":["PEROT","BUSH","CLINTON","LEHRER","THOMAS","GIBBONS","ROOK"]})
-
-    ####  2 debates Clinton v. Dole 1996
-    dictionaryOfSpeakers.update({"The_First_Clinton-Dole_Presidential_Debate.html":["CLINTON","DOLE","LEHRER"]})
-    dictionaryOfSpeakers.update({"The_Second_Clinton-Dole_Presidential_Debate.html":["CLINTON","DOLE","LEHRER","MR.","MS.","DR."]})#### Needs more formatting for audience questions
-
-    #### 3 debates Gore v. Bush 2000
-    dictionaryOfSpeakers.update({"The_First_Gore-Bush_Presidential_Debate.html":["GORE","BUSH","MODERATOR"]})
-    dictionaryOfSpeakers.update({"The_Second_Gore-Bush_Presidential_Debate.html":["GORE","BUSH","MODERATOR"]})
-    dictionaryOfSpeakers.update({"The_Third_Gore-Bush_Presidential_Debate.html":["GORE","BUSH","MODERATOR","MEMBER OF AUDIENCE"]})
-
-    ####3 debates Kerry v. Bush 2004
-    dictionaryOfSpeakers.update({"The_First_Bush-Kerry_Presidential_Debate.html":["KERRY","BUSH","LEHRER"]})
-    dictionaryOfSpeakers.update({"The_Second_Bush-Kerry_Presidential_Debate.html":["KERRY","BUSH","GIBSON"]})### AUDIENCE questions by NAME merged with moderator
-    dictionaryOfSpeakers.update({"The_Third_Bush-Kerry_Presidential_Debate.html":["KERRY","BUSH","SCHIEFFER"]})
-
-    #### 3 debates Obama v. McCain 2008
-    dictionaryOfSpeakers.update({"The_First_McCain-Obama_Presidential_Debate.html":["MCCAIN","OBAMA","LEHRER"]})
-    dictionaryOfSpeakers.update({"The_Second_McCain-Obama_Presidential_Debate.html":["MCCAIN","OBAMA","BROKAW"]})
-    dictionaryOfSpeakers.update({"The_Third_McCain-Obama_Presidential_Debate.html":["MCCAIN","OBAMA","SCHIEFFER"]})
-
-
-    #### 3 debates Obama v. Romney 2012
-    dictionaryOfSpeakers.update({"The_First_Obama-Romney_Presidential_Debate.html":["OBAMA","ROMNEY","LEHRER"]})
-    dictionaryOfSpeakers.update({"The_Second_Obama-Romney_Presidential_Debate.html":["OBAMA","ROMNEY","CROWLEY","QUESTION"]})
-    dictionaryOfSpeakers.update({"The_Third_Obama-Romney_Presidential_Debate.html":["OBAMA","ROMNEY","SCHIEFFER"]})
-
-    #### 3 debates Clinton v. Trump 2016
-    dictionaryOfSpeakers.update({"The_First_Clinton-Trump_Presidential_Debate.html":["CLINTON","TRUMP","HOLT"]})
-    dictionaryOfSpeakers.update({"The_Second_Clinton-Trump_Presidential_Debate.html":["CLINTON","TRUMP","COOPER","RADDATZ","QUESTION"]})
-    dictionaryOfSpeakers.update({"The_Third_Clinton-Trump_Presidential_Debate.html":["CLINTON","TRUMP","WALLACE"]})
-
-    dictionaryOfSpeakers.update({"JoeBidenVDonaldTrump1.html":["BIDEN","TRUMP","WALLACE"]})
-    dictionaryOfSpeakers.update({"JoeBidenVDonaldTrump2.html":["Biden","Trump","Welker"]})
+    dictionaryOfSpeakers=GetSpeakerList()
     path="HTML/"
     #FileNames=["JoeBidenVDonaldTrump1.html"]
     #print(dictionaryOfSpeakers)
