@@ -17,7 +17,7 @@ import sys
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.decomposition import NMF, LatentDirichletAllocation
 
-from definitions import GetPartyDictionary,SetMatchPatterns
+from definitions import GetPartyDictionary,SetMatchPatterns,SetFamilyMatchPatterns,TimestampsForDebates
 
 matplotlib.rc('font',family='monospace')
 plt.style.use('ggplot')
@@ -41,14 +41,12 @@ def BuildDF(partydict,DoAll=False,ADebate=""):
     ### Integer representaition
     PartyInt={"Democratic":0, "Republican":1}
     party=[PartyInt[p] for p in party]
-
-
     FascilatorDF=Debate_df[Debate_df["Candidates"]==False]
     CandidateDF.drop('Candidates',inplace=True,axis=1)
     FascilatorDF.drop('Candidates',inplace=True,axis=1)
-    Debate_df.drop('Candidates',inplace=True,axis=1)
+    del Debate_df
     CandidateDF.insert(CandidateDF.shape[1],"party",party,True)
-    return CandidateDF,FascilatorDF,Debate_df
+    return CandidateDF,FascilatorDF
 def CreateScatterText(CandidateDF,compact):
     nlp = spacy.load('en')
     CandidateDF=CandidateDF.sample(frac=1)#### Shuffle speakers for the meta data
@@ -177,27 +175,6 @@ def CreateTopics(scikittext,stop_words,topics=6,doLDA=False):
         nmf = NMF(n_components=topics, random_state=1,beta_loss='kullback-leibler', solver='mu', max_iter=1000, alpha=.1,l1_ratio=.5).fit(count)
         return nmf,count_feature_names;
 
-partydict=GetPartyDictionary()
-speakers=[key.lower() for key in partydict.keys() ]
-#CandidateDF,FascilatorDF,Debate_df=BuildDF(partydict,False,"Reagan-Mondale")
-CandidateDF,FascilatorDF,Debate_df=BuildDF(partydict,True)#### All DataFrame
-
-#### Build for pie charts:
-
-
-#CreateScatterText(CandidateDF,200000)
-#PromptsModeratorComments=[p.lower() for p in PromptsModeratorComments]
-nlpPyRank = spacy.load("en_core_web_lg")
-stop_words=['evening','night','senator','vice','president','united','states','question','questions','seconds','second','minutes','minute','last','mr','time','governor','closing','opening','rebuttal','segment',"follow up","transcription","town hall"]
-Moderatorlist=list(set(FascilatorDF["Speaker"].to_list()))
-stop_words.extend(", ".join(speakers).split(" "))
-stop_words.extend(", ".join(Moderatorlist).split())
-for w in stop_words:nlpPyRank.vocab[w].is_stop = True;
-tr = pytextrank.TextRank()
-nlpPyRank.add_pipe(tr.PipelineComponent, name="textrank", last=True)
-
-PromptsModeratorComments=FascilatorDF["Response"].to_list()
-
 ##### These lines are only for feature exploration
 def BuildTopics(PromptsModeratorComments,RankScore=0.1,NTopics=6,TopicWords=20,doLDA=False ):
     docs=nlpPyRank.pipe(PromptsModeratorComments)
@@ -206,20 +183,88 @@ def BuildTopics(PromptsModeratorComments,RankScore=0.1,NTopics=6,TopicWords=20,d
     topicWords=display_topics(model,count_feature_names,TopicWords)
     return model,topicWords
 
-##### At this point i have the key debate topics
-##############
+#### Build for pie charts:
 
-topic=0
+
+#PromptsModeratorComments=[p.lower() for p in PromptsModeratorComments]
+#CreateScatterText(CandidateDF,200000)
+nlpPyRank = spacy.load("en_core_web_lg")
+tr = pytextrank.TextRank()
+nlpPyRank.add_pipe(tr.PipelineComponent, name="textrank", last=True)
+matcher = Matcher(nlpPyRank.vocab)
+#fam_matcher = Matcher(nlpPyRank.vocab)
+
+stop_words=['evening','night','senator','vice','president','united','states','question','questions','seconds','second','minutes','minute','last','mr','time','governor','closing','opening','rebuttal','segment',"follow up","transcription","town hall"]
+partydict=GetPartyDictionary()
+'''
+#### For all topics
+CandidateDF,FascilatorDF=BuildDF(partydict,True)#### All DataFrame
+Moderatorlist=list(set(FascilatorDF["Speaker"].to_list()))
+speakers=[key.lower() for key in partydict.keys() ]
+stop_words.extend(", ".join(speakers).split(" "))
+stop_words.extend(", ".join(Moderatorlist).split())
+for w in stop_words:nlpPyRank.vocab[w].is_stop = True;
+
+for key in DebatesandTimestamps.keys():
+    CandidateDF,FascilatorDF=BuildDF(partydict,False,key)#### All DataFrame
+    del CandidateDF;
+    PromptsModeratorComments=FascilatorDF["Response"].to_list()
+    BuildTopics(PromptsModeratorComments)
+
+'''
+
+
+def FillTopicCounts(matcher,Canddocs,DebateTitle,dictionaryCounts,dictionaryFoundKeywords):
+    TopicMatches=[]
+    for doc in Canddocs:### Loop in order of the response column
+        matches=matcher(doc)
+        if(len(matches)>0):TopicMatches.append(True)
+        else:TopicMatches.append(False)
+        for match_id, start, end in matches:
+            Topic=nlpPyRank.vocab.strings[match_id]
+            dictionaryCounts[Topic]=dictionaryCounts[Topic]+1#### Count for each topic
+            dictionaryFoundKeywords[Topic].append(doc[start:end].text)
+    for key in dictionaryFoundKeywords.keys():dictionaryFoundKeywords[key]=list(set(dictionaryFoundKeywords[key]))#### Keywords
+    Topics=[key for key in dictionaryCounts.keys()]
+    Counts=[dictionaryCounts[key] for key in dictionaryCounts.keys()]
+    Keywords=[", ".join(dictionaryFoundKeywords[key]) for key in dictionaryCounts.keys()]
+    Dfout=pd.DataFrame.from_dict({"Topic":Topics,"Count":Counts,"Keywords":Keywords})
+    print(Counts)
+    return Dfout,TopicMatches
+
+
+
+def BuildPieCharts(DebatesandTimestamps,matcher):
+    matcher,dictionaryFoundKeywords,dictionaryCounts=SetMatchPatterns(matcher)
+    partydict=GetPartyDictionary()
+    ListForPieCharts=[]
+    for key in DebatesandTimestamps.keys():
+        CandidateDF,FascilatorDF=BuildDF(partydict,False,key)#### All DataFrame
+        del FascilatorDF
+        CandResponses=CandidateDF["Response"].to_list()
+        Canddocs=nlpPyRank.pipe(CandResponses)
+        for TopicKey in dictionaryCounts:
+            dictionaryCounts[TopicKey]=0
+            dictionaryFoundKeywords[TopicKey]=[]
+        OutputDFPie,TopicMatches=FillTopicCounts(matcher,Canddocs,key,dictionaryCounts,dictionaryFoundKeywords)
+        Total=len(CandResponses)
+        Matches=sum(TopicMatches)
+        OutputDFPie.insert(OutputDFPie.shape[1],column="Year",value=[DebatesandTimestamps[key] for i in range(OutputDFPie.shape[0])])
+        OutputDFPie.insert(OutputDFPie.shape[1],column="Debate",value=[key for i in range(OutputDFPie.shape[0])])
+        OutputDFPie.insert(OutputDFPie.shape[1],column="MatchEff",value=[Matches/Total for i in range(OutputDFPie.shape[0])])
+        ListForPieCharts.append(OutputDFPie)
+    PieCharts=pd.concat(ListForPieCharts)
+    PieCharts.to_csv("PieChartsPerYear.csv")
+
+#BuildPieCharts(DebatesandTimestamps,matcher)
+
+#### Make this a function that returns Test, Labeled samples
+CandidateDF,FascilatorDF=BuildDF(partydict,True)
+del FascilatorDF;
 CandResponses=CandidateDF["Response"].to_list()
-#CandResponses=[cand.lower() for cand in CandidateDF["Response"].to_list()]
 Speakers=[cand.lower() for cand in CandidateDF["Speaker"].to_list()]
 Canddocs=nlpPyRank.pipe(CandResponses)
-
-##### Make part of user definition functions
-matcher = Matcher(nlpPyRank.vocab)
 matcher,dictionaryFoundKeywords,dictionaryCounts=SetMatchPatterns(matcher)
-
-##### This function will record how many responses match a token based matchpattern
 TopicMatches=[]
 for doc in Canddocs:### Loop in order of the response column
     matches=matcher(doc)
@@ -230,17 +275,30 @@ for doc in Canddocs:### Loop in order of the response column
         dictionaryCounts[Topic]=dictionaryCounts[Topic]+1#### Count for each topic
         dictionaryFoundKeywords[Topic].append(doc[start:end].text)
 for key in dictionaryFoundKeywords.keys():dictionaryFoundKeywords[key]=list(set(dictionaryFoundKeywords[key]))#### Keywords
-CandidateDF.insert(CandidateDF.shape[1],column="MatchToTopic",value=TopicMatches)
-###Then require a topic match
 Topics=[key for key in dictionaryCounts.keys()]
 Counts=[dictionaryCounts[key] for key in dictionaryCounts.keys()]
 Keywords=[", ".join(dictionaryFoundKeywords[key]) for key in dictionaryCounts.keys()]
 Dfout=pd.DataFrame.from_dict({"Topic":Topics,"Count":Counts,"Keywords":Keywords})
-Dfout.to_csv("OutputTotalDebateTopics.csv")
-##### At this point you could make a pie chart from the above data
+Dfout.to_csv("TotalYieldsPieChart.csv")
 
+#for key in DebatesandTimestamps.keys():
+#        CandidateDF,FascilatorDF=BuildDF(partydict,False,key)#### All DataFrame#
+#        del FascilatorDF
+        #CandResponses=CandidateDF["Response"].to_list()
+        #Canddocs=nlpPyRank.pipe(CandResponses)
+
+##### This function will record how many responses match a token based matchpattern
+
+
+
+##### At this point you could make a pie chart from the above data
+###Then require a topic match
+
+CandidateDF.insert(CandidateDF.shape[1],column="MatchToTopic",value=TopicMatches)
 UnlabeledCandidateDF=CandidateDF[CandidateDF.MatchToTopic==False]
 UnlabeledCandidateDF.to_csv("Test_candidates.csv")
+
+
 CandidateDF=CandidateDF[CandidateDF.MatchToTopic==True]
 CandDocsKeywords=nlpPyRank.pipe(CandidateDF.Response.to_list())
 MatchedWords=[]

@@ -67,7 +67,12 @@ def GetPartyDictionary():
         "BILL CLINTON":"Democratic","HILLARY CLINTON":"Democratic","DOLE":"Republican","GORE":"Democratic",
         "KERRY":"Democratic","TRUMP":"Republican","BIDEN":"Democratic"}
     return partydict;
-
+def SetFamilyMatchPatterns(fam_matcher):
+    FamilyMatches=[{"LOWER":{"IN":["your","his","her"]}},{"LEMMA":{"IN":["sister","brother","family","son","daughter","wife","husband","father","dad","mom"]}}]
+    fam_matcher.add("FamilyAttacks",None,FamilyMatches)
+    dictionaryFoundKeywords={"FamilyAttacks":[]}
+    dictionaryCounts={"FamilyAttacks":0}
+    return fam_matcher,dictionaryFoundKeywords,dictionaryCounts
 def SetMatchPatterns(matcher):
     #### Race relations and racial sensitivity
     RACE=[{"LOWER":"black"},{"POS":"NOUN"}]
@@ -81,7 +86,8 @@ def SetMatchPatterns(matcher):
     matcher.add("Race",None,[{"LOWER":"non"},{"IS_PUNCT":True,"OP":"?"},{"LOWER":"whites"}])
 
     #### Gun control:
-    matcher.add("Gun Control",None,[{"LOWER":"gun"},{"LOWER":"control", "OP":"?"}])
+    matcher.add("Gun Control",None,[{"LOWER":"handgun"}])
+    matcher.add("Gun Control",None,[{"LEMMA":"gun"},{"LOWER":"control", "OP":"?"}])
     matcher.add("Gun Control",None,[{"LOWER":"assault"},{"LOWER":"weapons"}])
     matcher.add("Gun Control",None,[{"LOWER":"high"},{"LOWER":"capacity"},{"LEMMA":"magazine"}])
     #### Oil:
@@ -122,6 +128,7 @@ def SetMatchPatterns(matcher):
     matcher.add("Economy",None,[{"LOWER":"unemployment"}])
     matcher.add("Economy",None,[{"LOWER":"working"},{"LOWER":"families"}])
     matcher.add("Economy",None,[{"LOWER":"wage"},{"LEMMA":"earner"}])
+    matcher.add("Economy",None,[{"LOWER":"jobs"}])
 
     ### Social Welfare programs: e.g. Social Security, housing subsidies, federal minimum wage,
     matcher.add("Social Welfare",None,[{"LOWER":"social"},{"LOWER":"security"}])
@@ -153,6 +160,7 @@ def SetMatchPatterns(matcher):
     matcher.add("National Defense",None,[{"LOWER":"back"},{"LOWER":"door"},{"LOWER":"draft"}])
 
     #### Immigration
+    matcher.add("Immigration",None,[{"LOWER":"immigration"}])
     matcher.add("Immigration",None,[{"LOWER":"immigration"},{"LOWER":"reform"}])
     matcher.add("Immigration",None,[{"LOWER":"green"},{"LOWER":"cards"}])
     matcher.add("Immigration",None,[{"LOWER":"illegal"},{"LOWER":{"IN":["immigration","workers"]}}])
@@ -166,15 +174,20 @@ def SetMatchPatterns(matcher):
     matcher.add("Climate Change", None, [{"LOWER":"energy"}, {"LOWER":{"IN":["secretary", "policy"]}}])
     matcher.add("Climate Change", None, [{"LOWER":"conservation"}, {"LOWER":"efforts"}])
 
+
+    matcher.add("Taxes",None,[{"Lemma":"tax"}, {"LOWER":{"IN":["credit","credits","penalties","provisions","cuts"], "OP":"?"}}])
+    matcher.add("Taxes",None,[{"LOWER":{"IN":["raise","lower","increase","decrease"]}},{"Lemma":"tax"}])
+    matcher.add("Taxes",None,[{"LOWER":"income"},{"LEMMA":"tax"}])
+
     #### Return these
     dictionaryFoundKeywords={"Race":[],"Immigration":[], "Gun Control":[],"Climate Change":[], "Federal Spending":[], "abortion":[], "National Defense":[],
-    "Oil Industry":[], "Economy":[], "Public Education":[],"Health Care":[], "Social Welfare":[]}
+    "Oil Industry":[], "Economy":[], "Public Education":[],"Health Care":[], "Social Welfare":[],"Taxes":[]}
     dictionaryCounts={"Race":0,"Immigration":0, "Gun Control":0,"Climate Change":0, "Federal Spending":0, "abortion":0, "National Defense":0,
-    "Oil Industry":0, "Economy":0, "Public Education":0,"Health Care":0, "Social Welfare":0  }
+    "Oil Industry":0, "Economy":0, "Public Education":0,"Health Care":0, "Social Welfare":0, "Taxes":0}
     return matcher,dictionaryFoundKeywords,dictionaryCounts
 
 def TimestampsForDebates():
     TimeStamps={"Kennedy-Nixon":1960,"Carter-Ford":1976, "Carter-Reagan":1980,"Reagan-Mondale":1984,
-    "Bush-Dukakis":1988, "Clinton-Bush":1992, "Clinton-Dole":1996, "Gore-Bush":2000, "Bush-Kerry":2004
+    "Bush-Dukakis":1988, "Clinton-Bush":1992, "Clinton-Dole":1996, "Gore-Bush":2000, "Bush-Kerry":2004,
     "McCain-Obama":2008, "Obama-Romney":2012, "Clinton-Trump":2016, "JoeBidenVDonaldTrump":2020}
     return TimeStamps
