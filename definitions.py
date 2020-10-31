@@ -139,6 +139,7 @@ def SetMatchPatterns(matcher):
 
 
     #### Public education
+    matcher.add("Public Education",None,[{"LEMMA":{"IN":["students","teachers"]}}])
     matcher.add("Public Education",None,[{"LOWER":"public"},{"LOWER":"education"}])
     matcher.add("Public Education",None,[{"LEMMA":"school"},{"LOWER":{"IN":["buildings","teachers","districts","violence"],"OP":"?"}}])
     matcher.add("Public Education",None,[{"LOWER":"teacher"},{"LOWER":"salaries"}])
@@ -146,6 +147,7 @@ def SetMatchPatterns(matcher):
 
     #### Abortion
     matcher.add("abortion",None,[{"LOWER":{"IN":["abortions","abortion"]}}])
+    matcher.add("abortion",None,[{"LOWER":{"IN":["anti","pro"]}},{"IS_PUNCT":True,"OP":"?"},{"LEMMA":"abortion"}])
 
     #####National security/Defense
     matcher.add("National Defense",None,[{"LOWER":"defense"},{"LOWER":{"IN":["spending","budget"]}}])
