@@ -1,0 +1,170 @@
+,Topic,Count,Keywords,Year,Debate,MatchEff
+0,Race,7,"civil rights, affirmative action, racial",1960,Kennedy-Nixon,0.48484848484848486
+1,Immigration,0,,1960,Kennedy-Nixon,0.48484848484848486
+2,Gun Control,4,gun,1960,Kennedy-Nixon,0.48484848484848486
+3,Climate Change,0,,1960,Kennedy-Nixon,0.48484848484848486
+4,Federal Spending,11,"surplus, deficit, federal debt, federal spending",1960,Kennedy-Nixon,0.48484848484848486
+5,abortion,0,,1960,Kennedy-Nixon,0.48484848484848486
+6,National Defense,5,"national security, military equipment, military action, military power",1960,Kennedy-Nixon,0.48484848484848486
+7,Oil Industry,20,"oil industry, depletion allowance, oil",1960,Kennedy-Nixon,0.48484848484848486
+8,Economy,61,"unemployment, more jobs, economy, jobs, economic growth, full employment",1960,Kennedy-Nixon,0.48484848484848486
+9,Public Education,5,"teacher salaries, school districts",1960,Kennedy-Nixon,0.48484848484848486
+10,Health Care,4,"health insurance, health care, private insurance",1960,Kennedy-Nixon,0.48484848484848486
+11,Social Welfare,27,"social security, minimum wage",1960,Kennedy-Nixon,0.48484848484848486
+12,Taxes,1,tax cuts,1960,Kennedy-Nixon,0.48484848484848486
+0,Race,11,"civil rights, black nations, black community, black people, black businessman, affirmative action, black businessmen, black entrepreneur",1976,Carter-Ford,0.5739130434782609
+1,Immigration,0,,1976,Carter-Ford,0.5739130434782609
+2,Gun Control,28,"handgun, gun control, guns, gun",1976,Carter-Ford,0.5739130434782609
+3,Climate Change,8,"air pollution, energy policy",1976,Carter-Ford,0.5739130434782609
+4,Federal Spending,17,"surplus, deficit, federal deficit, federal spending",1976,Carter-Ford,0.5739130434782609
+5,abortion,6,"abortion, abortions",1976,Carter-Ford,0.5739130434782609
+6,National Defense,20,"national security, military equipment, defense budget",1976,Carter-Ford,0.5739130434782609
+7,Oil Industry,23,"oil, arab oil",1976,Carter-Ford,0.5739130434782609
+8,Economy,131,"unemployment, more jobs, economy, jobs, businesses, inflation rate, economic growth, savings accounts",1976,Carter-Ford,0.5739130434782609
+9,Public Education,0,,1976,Carter-Ford,0.5739130434782609
+10,Health Care,9,health care,1976,Carter-Ford,0.5739130434782609
+11,Social Welfare,2,social security,1976,Carter-Ford,0.5739130434782609
+12,Taxes,2,"tax credit, income tax",1976,Carter-Ford,0.5739130434782609
+0,Race,11,"black unemployment, racial, discrimination",1980,Carter-Reagan,0.66
+1,Immigration,0,,1980,Carter-Reagan,0.66
+2,Gun Control,0,,1980,Carter-Reagan,0.66
+3,Climate Change,9,"air pollution, energy policy",1980,Carter-Reagan,0.66
+4,Federal Spending,0,,1980,Carter-Reagan,0.66
+5,abortion,0,,1980,Carter-Reagan,0.66
+6,National Defense,9,"national security, defense spending, military power, military forces",1980,Carter-Reagan,0.66
+7,Oil Industry,20,"oil, foreign oil",1980,Carter-Reagan,0.66
+8,Economy,38,"unemployment, working families, economy, jobs, businesses, inflation rate",1980,Carter-Reagan,0.66
+9,Public Education,0,,1980,Carter-Reagan,0.66
+10,Health Care,5,health insurance,1980,Carter-Reagan,0.66
+11,Social Welfare,31,"social security, minimum wage",1980,Carter-Reagan,0.66
+12,Taxes,2,"tax credits, tax cuts",1980,Carter-Reagan,0.66
+0,Race,7,"civil rights, hispanic, discrimination",1984,Reagan-Mondale,0.3805309734513274
+1,Immigration,5,"immigration, illegal immigration",1984,Reagan-Mondale,0.3805309734513274
+2,Gun Control,1,gun,1984,Reagan-Mondale,0.3805309734513274
+3,Climate Change,0,,1984,Reagan-Mondale,0.3805309734513274
+4,Federal Spending,22,"deficit, federal spending",1984,Reagan-Mondale,0.3805309734513274
+5,abortion,8,abortion,1984,Reagan-Mondale,0.3805309734513274
+6,National Defense,7,"national security, defense budget, defense spending",1984,Reagan-Mondale,0.3805309734513274
+7,Oil Industry,1,oil,1984,Reagan-Mondale,0.3805309734513274
+8,Economy,35,"unemployment, economy, jobs, businesses, economic growth",1984,Reagan-Mondale,0.3805309734513274
+9,Public Education,1,school districts,1984,Reagan-Mondale,0.3805309734513274
+10,Health Care,2,public health,1984,Reagan-Mondale,0.3805309734513274
+11,Social Welfare,28,social security,1984,Reagan-Mondale,0.3805309734513274
+12,Taxes,1,income tax,1984,Reagan-Mondale,0.3805309734513274
+0,Race,0,,1988,Bush-Dukakis,0.36585365853658536
+1,Immigration,0,,1988,Bush-Dukakis,0.36585365853658536
+2,Gun Control,2,"gun control, gun",1988,Bush-Dukakis,0.36585365853658536
+3,Climate Change,0,,1988,Bush-Dukakis,0.36585365853658536
+4,Federal Spending,13,"federal debt, deficit",1988,Bush-Dukakis,0.36585365853658536
+5,abortion,2,abortion,1988,Bush-Dukakis,0.36585365853658536
+6,National Defense,8,"national security, defense budget, nuclear warheads, defense spending",1988,Bush-Dukakis,0.36585365853658536
+7,Oil Industry,0,,1988,Bush-Dukakis,0.36585365853658536
+8,Economy,15,"economic problems, economy, working families, financial problems, jobs, good jobs, economic growth",1988,Bush-Dukakis,0.36585365853658536
+9,Public Education,0,,1988,Bush-Dukakis,0.36585365853658536
+10,Health Care,19,"health insurance, health care, public health, socialized medicine",1988,Bush-Dukakis,0.36585365853658536
+11,Social Welfare,7,social security,1988,Bush-Dukakis,0.36585365853658536
+12,Taxes,0,,1988,Bush-Dukakis,0.36585365853658536
+0,Race,17,"civil rights, racial, discrimination, segregated, black church",1992,Clinton-Bush,0.4069767441860465
+1,Immigration,0,,1992,Clinton-Bush,0.4069767441860465
+2,Gun Control,5,"gun control, assault weapons, guns, gun",1992,Clinton-Bush,0.4069767441860465
+3,Climate Change,0,,1992,Clinton-Bush,0.4069767441860465
+4,Federal Spending,35,"discretionary spending, deficit, surplus",1992,Clinton-Bush,0.4069767441860465
+5,abortion,0,,1992,Clinton-Bush,0.4069767441860465
+6,National Defense,6,"national security, military forces, military technology, defense budget, National security",1992,Clinton-Bush,0.4069767441860465
+7,Oil Industry,2,oil,1992,Clinton-Bush,0.4069767441860465
+8,Economy,117,"unemployment, more jobs, economic problems, economy, working families, small businesses, jobs, businesses, good jobs, economic growth, American jobs",1992,Clinton-Bush,0.4069767441860465
+9,Public Education,6,"high school graduates, school teachers, public education",1992,Clinton-Bush,0.4069767441860465
+10,Health Care,51,"health insurance, health care, public health, insurance companies",1992,Clinton-Bush,0.4069767441860465
+11,Social Welfare,15,"social security, Social Security",1992,Clinton-Bush,0.4069767441860465
+12,Taxes,13,"tax credit, income tax, tax credits, tax cuts",1992,Clinton-Bush,0.4069767441860465
+0,Race,10,"black people, civil rights, discrimination",1996,Clinton-Dole,0.45977011494252873
+1,Immigration,0,,1996,Clinton-Dole,0.45977011494252873
+2,Gun Control,12,"guns, gun",1996,Clinton-Dole,0.45977011494252873
+3,Climate Change,0,,1996,Clinton-Dole,0.45977011494252873
+4,Federal Spending,1,deficit,1996,Clinton-Dole,0.45977011494252873
+5,abortion,0,,1996,Clinton-Dole,0.45977011494252873
+6,National Defense,3,"defense budget, defense spending, more troops",1996,Clinton-Dole,0.45977011494252873
+7,Oil Industry,0,,1996,Clinton-Dole,0.45977011494252873
+8,Economy,56,"more jobs, economic problems, working families, economy, american jobs, jobs, good jobs",1996,Clinton-Dole,0.45977011494252873
+9,Public Education,0,,1996,Clinton-Dole,0.45977011494252873
+10,Health Care,8,health care,1996,Clinton-Dole,0.45977011494252873
+11,Social Welfare,19,social security,1996,Clinton-Dole,0.45977011494252873
+12,Taxes,8,"tax credit, tax cuts",1996,Clinton-Dole,0.45977011494252873
+0,Race,36,"civil rights, hispanic, racial, affirmative action, hate crime, discrimination, hate crimes",2000,Gore-Bush,0.3980891719745223
+1,Immigration,0,,2000,Gore-Bush,0.3980891719745223
+2,Gun Control,51,"handgun, assault weapons, guns, gun",2000,Gore-Bush,0.3980891719745223
+3,Climate Change,7,"global warming, energy policy",2000,Gore-Bush,0.3980891719745223
+4,Federal Spending,26,"surplus, deficit, federal spending",2000,Gore-Bush,0.3980891719745223
+5,abortion,9,"abortion, abortions",2000,Gore-Bush,0.3980891719745223
+6,National Defense,17,"national security, military action, military power, military forces",2000,Gore-Bush,0.3980891719745223
+7,Oil Industry,20,"oil, foreign oil",2000,Gore-Bush,0.3980891719745223
+8,Economy,50,"unemployment, gdp, economy, small businesses, jobs, businesses, financial crisis, stock market, good jobs, economic growth, wage earners, savings accounts",2000,Gore-Bush,0.3980891719745223
+9,Public Education,10,"school teachers, public education, school districts",2000,Gore-Bush,0.3980891719745223
+10,Health Care,87,"health insurance, health care, prescription drugs, insurance companies",2000,Gore-Bush,0.3980891719745223
+11,Social Welfare,65,social security,2000,Gore-Bush,0.3980891719745223
+12,Taxes,26,"tax credit, income tax, tax credits, tax cuts",2000,Gore-Bush,0.3980891719745223
+0,Race,9,"civil rights, black males, black children, hispanic, affirmative action, black market, discrimination",2004,Bush-Kerry,0.330188679245283
+1,Immigration,5,"immigration, immigration reform",2004,Bush-Kerry,0.330188679245283
+2,Gun Control,13,"assault weapons, guns, gun, gunned",2004,Bush-Kerry,0.330188679245283
+3,Climate Change,3,global warming,2004,Bush-Kerry,0.330188679245283
+4,Federal Spending,16,"discretionary spending, federal spending, deficit, surplus",2004,Bush-Kerry,0.330188679245283
+5,abortion,15,"abortion, abortions",2004,Bush-Kerry,0.330188679245283
+6,National Defense,2,"military forces, national security",2004,Bush-Kerry,0.330188679245283
+7,Oil Industry,7,oil,2004,Bush-Kerry,0.330188679245283
+8,Economy,104,"unemployment, economy, small businesses, jobs, businesses, stock market, economic issues, savings accounts",2004,Bush-Kerry,0.330188679245283
+9,Public Education,2,"public education, school districts",2004,Bush-Kerry,0.330188679245283
+10,Health Care,64,"health insurance, health care, private insurance, prescription drugs",2004,Bush-Kerry,0.330188679245283
+11,Social Welfare,23,"social security, minimum wage",2004,Bush-Kerry,0.330188679245283
+12,Taxes,12,"tax credit, income tax, tax cuts",2004,Bush-Kerry,0.330188679245283
+0,Race,3,"civil rights, discrimination",2008,McCain-Obama,0.36830357142857145
+1,Immigration,1,immigration,2008,McCain-Obama,0.36830357142857145
+2,Gun Control,2,gun,2008,McCain-Obama,0.36830357142857145
+3,Climate Change,24,"alternative energy, climate change, global warming, energy policy",2008,McCain-Obama,0.36830357142857145
+4,Federal Spending,22,"spending freeze, surplus, deficit, federal spending",2008,McCain-Obama,0.36830357142857145
+5,abortion,16,"abortion, abortions, pro-abortion",2008,McCain-Obama,0.36830357142857145
+6,National Defense,51,"national security, nuclear warheads, defense spending, more troops, military power",2008,McCain-Obama,0.36830357142857145
+7,Oil Industry,75,"oil, gas prices, foreign oil",2008,McCain-Obama,0.36830357142857145
+8,Economy,187,"economy, working families, financial rescue, small businesses, jobs, financial crisis, businesses, economic growth, economic issues, economic crisis",2008,McCain-Obama,0.36830357142857145
+9,Public Education,3,school districts,2008,McCain-Obama,0.36830357142857145
+10,Health Care,108,"insurance companies, health care, health insurance, prescription drugs",2008,McCain-Obama,0.36830357142857145
+11,Social Welfare,5,social security,2008,McCain-Obama,0.36830357142857145
+12,Taxes,38,"tax credit, income tax, tax cuts",2008,McCain-Obama,0.36830357142857145
+0,Race,1,discrimination,2012,Obama-Romney,0.3333333333333333
+1,Immigration,21,"immigration, illegal immigration, immigration reform, green cards",2012,Obama-Romney,0.3333333333333333
+2,Gun Control,14,"assault weapons, guns, gun",2012,Obama-Romney,0.3333333333333333
+3,Climate Change,1,energy policy,2012,Obama-Romney,0.3333333333333333
+4,Federal Spending,53,"surplus, deficit, federal deficit",2012,Obama-Romney,0.3333333333333333
+5,abortion,0,,2012,Obama-Romney,0.3333333333333333
+6,National Defense,17,"national security, nuclear warheads, defense budget, more troops, military action, military power",2012,Obama-Romney,0.3333333333333333
+7,Oil Industry,50,"oil imports, oil, gas prices, oil industry",2012,Obama-Romney,0.3333333333333333
+8,Economy,351,"unemployment, more jobs, economy, paying jobs, small businesses, jobs, businesses, financial crisis, good jobs, economic growth, economic crisis, economic issues",2012,Obama-Romney,0.3333333333333333
+9,Public Education,0,,2012,Obama-Romney,0.3333333333333333
+10,Health Care,50,"health insurance, health care, private insurance, insurance companies",2012,Obama-Romney,0.3333333333333333
+11,Social Welfare,14,social security,2012,Obama-Romney,0.3333333333333333
+12,Taxes,24,"tax credit, lower tax, income tax, tax cuts",2012,Obama-Romney,0.3333333333333333
+0,Race,18,"black businesses, black youth, black communities, black president, hispanic, racial, discrimination, racist, black church",2016,Clinton-Trump,0.17077464788732394
+1,Immigration,7,"immigration, immigration reform",2016,Clinton-Trump,0.17077464788732394
+2,Gun Control,28,"guns, gun",2016,Clinton-Trump,0.17077464788732394
+3,Climate Change,5,"climate change, global warming, energy policy",2016,Clinton-Trump,0.17077464788732394
+4,Federal Spending,8,"surplus, deficit",2016,Clinton-Trump,0.17077464788732394
+5,abortion,3,"abortion, abortions",2016,Clinton-Trump,0.17077464788732394
+6,National Defense,5,"national security, nuclear warheads",2016,Clinton-Trump,0.17077464788732394
+7,Oil Industry,10,oil,2016,Clinton-Trump,0.17077464788732394
+8,Economy,136,"gdp, economy, working families, paying jobs, small businesses, jobs, businesses, financial crisis, stock market, good jobs",2016,Clinton-Trump,0.17077464788732394
+9,Public Education,1,public education,2016,Clinton-Trump,0.17077464788732394
+10,Health Care,29,"health insurance, health care, prescription drugs, insurance companies",2016,Clinton-Trump,0.17077464788732394
+11,Social Welfare,7,"social security, minimum wage",2016,Clinton-Trump,0.17077464788732394
+12,Taxes,16,"lower tax, income tax, tax cuts",2016,Clinton-Trump,0.17077464788732394
+0,Race,11,"civil rights, white supremacists, black community, hispanic, racial, racist",2020,JoeBidenVDonaldTrump,0.14144736842105263
+1,Immigration,0,,2020,JoeBidenVDonaldTrump,0.14144736842105263
+2,Gun Control,0,,2020,JoeBidenVDonaldTrump,0.14144736842105263
+3,Climate Change,1,global warming,2020,JoeBidenVDonaldTrump,0.14144736842105263
+4,Federal Spending,2,deficit,2020,JoeBidenVDonaldTrump,0.14144736842105263
+5,abortion,0,,2020,JoeBidenVDonaldTrump,0.14144736842105263
+6,National Defense,0,,2020,JoeBidenVDonaldTrump,0.14144736842105263
+7,Oil Industry,3,oil,2020,JoeBidenVDonaldTrump,0.14144736842105263
+8,Economy,42,"unemployment, more jobs, economy, paying jobs, small businesses, jobs, businesses, stock market, good jobs, economic growth",2020,JoeBidenVDonaldTrump,0.14144736842105263
+9,Public Education,0,,2020,JoeBidenVDonaldTrump,0.14144736842105263
+10,Health Care,13,"health insurance, insurance companies, health care, socialized medicine, private insurance",2020,JoeBidenVDonaldTrump,0.14144736842105263
+11,Social Welfare,0,,2020,JoeBidenVDonaldTrump,0.14144736842105263
+12,Taxes,5,"income tax, tax credits, tax cuts",2020,JoeBidenVDonaldTrump,0.14144736842105263

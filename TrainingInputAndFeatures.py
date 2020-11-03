@@ -26,7 +26,7 @@ plt.xlabel("Debate Topics")
 plt.ylabel("Count Freq.")
 
 
-def BuildDF(partydict,DoAll=False,ADebate=""):
+def BuildDF(partydict,DoAll=False,ADebate="",Relabel=True):
     #
     if DoAll:Debate_df = pd.concat(map(pd.read_csv, glob.glob(os.path.join('', "RawCSV/*.csv" ))),ignore_index=True)
     else:Debate_df = pd.concat(map(pd.read_csv, glob.glob(os.path.join('', "RawCSV/*%s*.csv" %ADebate))),ignore_index=True)
@@ -40,14 +40,14 @@ def BuildDF(partydict,DoAll=False,ADebate=""):
     party=[partydict[s] for s in CandidateDF["Speaker"].to_list()]
     ### Integer representaition
     PartyInt={"Democratic":0, "Republican":1}
-    party=[PartyInt[p] for p in party]
+    if Relabel:party=[PartyInt[p] for p in party]
     FascilatorDF=Debate_df[Debate_df["Candidates"]==False]
     CandidateDF.drop('Candidates',inplace=True,axis=1)
     FascilatorDF.drop('Candidates',inplace=True,axis=1)
     del Debate_df
     CandidateDF.insert(CandidateDF.shape[1],"party",party,True)
     return CandidateDF,FascilatorDF
-def CreateScatterText(CandidateDF,compact):
+def CreateScatterText(CandidateDF):
     nlp = spacy.load('en')
     CandidateDF=CandidateDF.sample(frac=1)#### Shuffle speakers for the meta data
     CandidateDF = CandidateDF.assign(
@@ -59,7 +59,7 @@ def CreateScatterText(CandidateDF,compact):
         category_col='party',
         parsed_col='parse',
         feats_from_spacy_doc=PyTextRankPhrases()
-    ).build().compact(AssociationCompactor(compact, use_non_text_features=True))
+    ).build()#.compact(AssociationCompactor(compact, use_non_text_features=True))
     print('Aggregate PyTextRank phrase scores')
     term_category_scores = corpus.get_metadata_freq_df('')
     print(term_category_scores)
@@ -132,7 +132,8 @@ def display_topics(model, feature_names, no_top_words):
         topicWords.append(", ".join([feature_names[i]for i in topic.argsort()[:-no_top_words - 1:-1]]))
     return topicWords
 #### Make this a new function
-def InputTextFeatures(docs,threshold,stop_words):
+def InputTextFeatures(nlpPyRank,PromptsModeratorComments,threshold,stop_words):
+    docs=nlpPyRank.pipe(PromptsModeratorComments)
     scikittext=[]
     #article=[]
     rank=[]
@@ -176,34 +177,43 @@ def CreateTopics(scikittext,stop_words,topics=6,doLDA=False):
         return nmf,count_feature_names;
 
 ##### These lines are only for feature exploration
-def BuildTopics(PromptsModeratorComments,RankScore=0.1,NTopics=6,TopicWords=20,doLDA=False ):
-    docs=nlpPyRank.pipe(PromptsModeratorComments)
-    scikittext=InputTextFeatures(docs,RankScore,stop_words)
-    model=CreateTopics(scikittext,stop_words,NTopics,doLDA)
+def BuildTopics(nlpPyRank,stop_words,PromptsModeratorComments,RankScore=0.1,NTopics=6,TopicWords=20,doLDA=False):
+    scikittext=InputTextFeatures(nlpPyRank,PromptsModeratorComments,RankScore,stop_words)
+    model,count_feature_names=CreateTopics(scikittext,stop_words,NTopics,doLDA)
     topicWords=display_topics(model,count_feature_names,TopicWords)
     return model,topicWords
+
+def PlotScatterText(partydict):
+    CandidateDF,FascilatorDF=BuildDF(partydict,DoAll=True,Relabel=False)#### All DataFrame
+    del FascilatorDF;
+    CandidateDF=CandidateDF.sample(frac=1.)
+    CreateScatterText(CandidateDF)
+
 
 #### Build for pie charts:
 
 
 #PromptsModeratorComments=[p.lower() for p in PromptsModeratorComments]
-#CreateScatterText(CandidateDF,200000)
+#### Mode for running Scattertext
+'''
+partydict=GetPartyDictionary()
 nlpPyRank = spacy.load("en_core_web_lg")
 tr = pytextrank.TextRank()
 nlpPyRank.add_pipe(tr.PipelineComponent, name="textrank", last=True)
 matcher = Matcher(nlpPyRank.vocab)
 
 stop_words=['evening','night','senator','vice','president','united','states','question','questions','seconds','second','minutes','minute','last','mr','time','governor','closing','opening','rebuttal','segment',"follow up","transcription","town hall"]
-partydict=GetPartyDictionary()
-'''
+
 #### For all topics
-CandidateDF,FascilatorDF=BuildDF(partydict,True)#### All DataFrame
+CandidateDF,FascilatorDF=BuildDF(partydict,DoAll=True)
+del CandidateDF
 Moderatorlist=list(set(FascilatorDF["Speaker"].to_list()))
+del FascilatorDF
 speakers=[key.lower() for key in partydict.keys() ]
 stop_words.extend(", ".join(speakers).split(" "))
 stop_words.extend(", ".join(Moderatorlist).split())
 for w in stop_words:nlpPyRank.vocab[w].is_stop = True;
-
+DebatesandTimestamps=TimestampsForDebates()
 for key in DebatesandTimestamps.keys():
     CandidateDF,FascilatorDF=BuildDF(partydict,False,key)#### All DataFrame
     del CandidateDF;
@@ -213,7 +223,7 @@ for key in DebatesandTimestamps.keys():
 '''
 
 
-def FillTopicCounts(matcher,Canddocs,DebateTitle,dictionaryCounts,dictionaryFoundKeywords):
+def FillTopicCounts(nlpPyRank,matcher,Canddocs,DebateTitle,dictionaryCounts,dictionaryFoundKeywords):
     TopicMatches=[]
     for doc in Canddocs:### Loop in order of the response column
         matches=matcher(doc)
@@ -233,7 +243,7 @@ def FillTopicCounts(matcher,Canddocs,DebateTitle,dictionaryCounts,dictionaryFoun
 
 
 
-def BuildPieCharts(DebatesandTimestamps,matcher):
+def BuildPieCharts(nlpPyRank,DebatesandTimestamps,matcher):
     matcher,dictionaryFoundKeywords,dictionaryCounts=SetMatchPatterns(matcher)
     partydict=GetPartyDictionary()
     ListForPieCharts=[]
@@ -245,7 +255,7 @@ def BuildPieCharts(DebatesandTimestamps,matcher):
         for TopicKey in dictionaryCounts:
             dictionaryCounts[TopicKey]=0
             dictionaryFoundKeywords[TopicKey]=[]
-        OutputDFPie,TopicMatches=FillTopicCounts(matcher,Canddocs,key,dictionaryCounts,dictionaryFoundKeywords)
+        OutputDFPie,TopicMatches=FillTopicCounts(nlpPyRank,matcher,Canddocs,key,dictionaryCounts,dictionaryFoundKeywords)
         Total=len(CandResponses)
         Matches=sum(TopicMatches)
         OutputDFPie.insert(OutputDFPie.shape[1],column="Year",value=[DebatesandTimestamps[key] for i in range(OutputDFPie.shape[0])])
@@ -255,118 +265,104 @@ def BuildPieCharts(DebatesandTimestamps,matcher):
     PieCharts=pd.concat(ListForPieCharts)
     PieCharts.to_csv("PieChartsPerYear.csv")
 
-#BuildPieCharts(DebatesandTimestamps,matcher)
-
-#### Make this a function that returns Test, Labeled samples
-CandidateDF,FascilatorDF=BuildDF(partydict,True)
-del FascilatorDF;
-print(CandidateDF.head())
-CandResponses=CandidateDF["Response"].to_list()
-CandParty=CandidateDF["party"].to_list()
-#Speakers=[cand.lower() for cand in CandidateDF["Speaker"].to_list()]
-Speakers=CandidateDF["Speaker"].to_list()
-Canddocs=nlpPyRank.pipe(CandResponses)
-dictionaryParse={"Speaker":[],"Response":[],"party":[]}
-count=0
-#### this would be the parser
-for doc in Canddocs:
-    if len(doc)>192:
-        #print(doc.text,len(doc.text))
-        divisions=int(len(doc)/192)
-        for i in range(divisions):
-            start=i*192
-            end=(i+1)*192
+def ParseBasedOnTokenLength(nlpPyRank,CandidateDF):
+    CandResponses=CandidateDF["Response"].to_list()
+    CandParty=CandidateDF["party"].to_list()
+    Speakers=CandidateDF["Speaker"].to_list()
+    Canddocs=nlpPyRank.pipe(CandResponses)
+    dictionaryParse={"Speaker":[],"Response":[],"party":[]}
+    count=0
+    #### this would be the parser
+    for doc in Canddocs:
+        if len(doc)>192:
+            #print(doc.text,len(doc.text))
+            divisions=int(len(doc)/192)
+            for i in range(divisions):
+                start=i*192
+                end=(i+1)*192
             #print(start,end,doc[start:end].text)
+                dictionaryParse["Speaker"].append(Speakers[count])
+                dictionaryParse["party"].append(CandParty[count])
+                dictionaryParse["Response"].append(doc[start:end].text)
+            if not len(doc)%192==0:
+                end=divisions*192
+                dictionaryParse["Response"].append(doc[end:len(doc)].text)
+                dictionaryParse["Speaker"].append(Speakers[count])
+                dictionaryParse["party"].append(CandParty[count])
+        else:
+            dictionaryParse["Response"].append(doc.text)
             dictionaryParse["Speaker"].append(Speakers[count])
             dictionaryParse["party"].append(CandParty[count])
-            dictionaryParse["Response"].append(doc[start:end].text)
-        if not len(doc)%192==0:
-            end=divisions*192
-            dictionaryParse["Response"].append(doc[end:len(doc)].text)
-            dictionaryParse["Speaker"].append(Speakers[count])
-            dictionaryParse["party"].append(CandParty[count])
-    else:
-        dictionaryParse["Response"].append(doc.text)
-        dictionaryParse["Speaker"].append(Speakers[count])
-        dictionaryParse["party"].append(CandParty[count])
-            #print(doc[end:len(doc)].text)
-        #print(dictionaryParse["Response"])
-    count=count+1
-CandidateDF=pd.DataFrame(dictionaryParse)
-Participants=list(set(Speakers))
-SpeakersTargets={Participants[i]:i for i in range(0, len(Participants))}
-print(SpeakersTargets,len(SpeakersTargets))
-CandidateDF.insert(CandidateDF.shape[1],column="IntSpeakerTarget",value=[SpeakersTargets[speaker] for speaker in CandidateDF["Speaker"].to_list()])
+        count=count+1
+    CandidateDF=pd.DataFrame(dictionaryParse)
+    return CandidateDF
+'''
+BuildPieCharts(DebatesandTimestamps,matcher)
+'''
 
-matcher,dictionaryFoundKeywords,dictionaryCounts=SetMatchPatterns(matcher)
-TopicMatches=[]
-Canddocs=nlpPyRank.pipe(CandidateDF.Response.to_list())
 
-for doc in Canddocs:### Loop in order of the response column
+def TotalCandPieChart(nlpPyRank,matcher,Canddocs):
+    matcher,dictionaryFoundKeywords,dictionaryCounts=SetMatchPatterns(matcher)
+    TopicMatches=[]
+    for doc in Canddocs:### Loop in order of the response column
         matches=matcher(doc)
         TopicMatches.append(len(matches)>0)
         for match_id, start, end in matches:
             Topic=nlpPyRank.vocab.strings[match_id]
             dictionaryCounts[Topic]=dictionaryCounts[Topic]+1#### Count for each topic
             dictionaryFoundKeywords[Topic].append(doc[start:end].text)
-for key in dictionaryFoundKeywords.keys():dictionaryFoundKeywords[key]=list(set(dictionaryFoundKeywords[key]))#### Keywords
-Topics=[key for key in dictionaryCounts.keys()]
-Counts=[dictionaryCounts[key] for key in dictionaryCounts.keys()]
-Keywords=[", ".join(dictionaryFoundKeywords[key]) for key in dictionaryCounts.keys()]
-Dfout=pd.DataFrame.from_dict({"Topic":Topics,"Count":Counts,"Keywords":Keywords})
-Dfout.to_csv("TotalYieldsPieChart.csv")
+    for key in dictionaryFoundKeywords.keys():dictionaryFoundKeywords[key]=list(set(dictionaryFoundKeywords[key]))#### Keywords
+    Topics=[key for key in dictionaryCounts.keys()]
+    Counts=[dictionaryCounts[key] for key in dictionaryCounts.keys()]
+    Keywords=[", ".join(dictionaryFoundKeywords[key]) for key in dictionaryCounts.keys()]
+    Dfout=pd.DataFrame.from_dict({"Topic":Topics,"Count":Counts,"Keywords":Keywords})
+    Dfout.to_csv("TotalYieldsPieChart.csv")
+    return TopicMatches,matcher
+#### return TopicMatches and CandidateDF
+####Create train and test sets Input Topics Input CandidateDF void
+#TopicMatches=TotalCandPieChart(matcher,Canddocs)
 
-#for key in DebatesandTimestamps.keys():
-#        CandidateDF,FascilatorDF=BuildDF(partydict,False,key)#### All DataFrame#
-#        del FascilatorDF
-        #CandResponses=CandidateDF["Response"].to_list()
-        #Canddocs=nlpPyRank.pipe(CandResponses)
+#### Make this a function that returns Test, Labeled samples
+'''
+CandidateDF,FascilatorDF=BuildDF(partydict,True)
+del FascilatorDF;
+print(CandidateDF.head())
+CandidateDF=ParseBasedOnTokenLength(CandidateDF)
+CandResponses=CandidateDF["Response"].to_list()
+CandParty=CandidateDF["party"].to_list()
+Speakers=CandidateDF["Speaker"].to_list()
+Canddocs=nlpPyRank.pipe(CandResponses)
+Participants=list(set(Speakers))
+SpeakersTargets={Participants[i]:i for i in range(0, len(Participants))}
+print(SpeakersTargets,len(SpeakersTargets))
+CandidateDF.insert(CandidateDF.shape[1],column="IntSpeakerTarget",value=[SpeakersTargets[speaker] for speaker in CandidateDF["Speaker"].to_list()])
+#### This would be the start of a function that takes in matcher, canddocs
+Canddocs=nlpPyRank.pipe(CandidateDF.Response.to_list())
+'''
+def CreateTrainTestSamples(nlpPyRank,matcher,TopicMatches,CandidateDF):
 
-##### This function will record how many responses match a token based matchpattern
-
-
-
-##### At this point you could make a pie chart from the above data
-###Then require a topic match
-
-
-
-CandidateDF.insert(CandidateDF.shape[1],column="MatchToTopic",value=TopicMatches)
-UnlabeledCandidateDF=CandidateDF[CandidateDF.MatchToTopic==False]
-UnlabeledCandidateDF.to_csv("Test_candidates.csv")
-
-
-CandidateDF=CandidateDF[CandidateDF.MatchToTopic==True]
-CandDocsKeywords=nlpPyRank.pipe(CandidateDF.Response.to_list())
-
-
-MatchedWords=[]
-Topics=[]
-
-
-for doc in CandDocsKeywords:### Loop in order of the response column
-    matches=matcher(doc)
-    ListOfMatchedWords=[]
-    ListOfTopics=[]
-    #### need to limit doc size for BERT to up to 512 tokens
-    for match_id, start, end in matches:
-        ListOfMatchedWords.append(doc[start:end].text)
-        Topic=nlpPyRank.vocab.strings[match_id]
-        ListOfTopics.append(Topic)
-
-    MatchedWords.append(", ".join(ListOfMatchedWords))
-    Topics.append(", ".join(list(set(ListOfTopics))))
-
-#Responses=[r.lower() for r in CandidateDF["Response"].to_list()]
-#CandidateDF.drop('Response',inplace=True,axis=1)
-#CandidateDF.insert(2,column="Response",value=Responses,allow_duplicates=True)
-UniqueTopics=list(set(Topics))
-TopicLabels={UniqueTopics[i]:i for i in range(0,len(UniqueTopics)) }
-
-print(TopicLabels,len(TopicLabels))
-CandidateDF.insert(CandidateDF.shape[1],column="Topics",value=Topics)
-CandidateDF.insert(CandidateDF.shape[1],column="IntTopicTarget",value=[TopicLabels[topic] for topic in Topics])
-CandidateDF.insert(CandidateDF.shape[1],column="MatchedWords",value=MatchedWords)
-
-#### Need to parse into 128 token segments so that I don't blow up RAM and the code fits on GPU
-CandidateDF.to_csv("candidate.csv")
+    CandidateDF.insert(CandidateDF.shape[1],column="MatchToTopic",value=TopicMatches)
+    UnlabeledCandidateDF=CandidateDF[CandidateDF.MatchToTopic==False]
+    UnlabeledCandidateDF.to_csv("Test_candidates.csv")
+    CandidateDF=CandidateDF[CandidateDF.MatchToTopic==True]
+    CandDocsKeywords=nlpPyRank.pipe(CandidateDF.Response.to_list())
+    MatchedWords=[]
+    Topics=[]
+    for doc in CandDocsKeywords:### Loop in order of the response column
+        matches=matcher(doc)
+        ListOfMatchedWords=[]
+        ListOfTopics=[]
+        #### need to limit doc size for BERT to up to 512 tokens
+        for match_id, start, end in matches:
+            ListOfMatchedWords.append(doc[start:end].text)
+            Topic=nlpPyRank.vocab.strings[match_id]
+            ListOfTopics.append(Topic)
+        MatchedWords.append(", ".join(ListOfMatchedWords))
+        Topics.append(", ".join(list(set(ListOfTopics))))
+    UniqueTopics=list(set(Topics))
+    TopicLabels={UniqueTopics[i]:i for i in range(0,len(UniqueTopics)) }
+    CandidateDF.insert(CandidateDF.shape[1],column="Topics",value=Topics)
+    CandidateDF.insert(CandidateDF.shape[1],column="IntTopicTarget",value=[TopicLabels[topic] for topic in Topics])
+    CandidateDF.insert(CandidateDF.shape[1],column="MatchedWords",value=MatchedWords)
+    #### Need to parse into 128 token segments so that I don't blow up RAM and the code fits on GPU
+    CandidateDF.to_csv("candidate.csv")
